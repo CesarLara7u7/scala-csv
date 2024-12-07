@@ -39,7 +39,6 @@ lazy val data = (project in file("data"))
     libraryDependencies ++= Seq(
       "com.typesafe.slick" %% "slick" % "3.4.1",
       "org.slf4j" % "slf4j-nop" % "2.0.9",
-      "org.mongodb.scala" %% "mongo-scala-driver" % "4.11.1"
     ),
     commonSettings
   )
