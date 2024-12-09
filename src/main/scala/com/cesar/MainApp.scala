@@ -1,7 +1,57 @@
 package com.cesar
 
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.javadsl.Behaviors
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import com.typesafe.config.{Config, ConfigFactory}
+
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
+
 object MainApp {
-  def main(args: Array[String]): Unit = {
-    println("Hola mundo")
+  private val config: Config = ConfigFactory.load().resolve()
+
+  private def startServer(routes: Route)(implicit
+                                         actorSystem: ActorSystem[Nothing], ec: ExecutionContext
+  ): Unit = {
+    val eventualBinding = Http().newServerAt(getAddres, getPort).bind(routes)
+    eventualBinding.onComplete {
+      case Success(binding) =>
+        val address = binding.localAddress
+        actorSystem.log.info(s"""Listening server at http://${address.getHostString}:${address.getPort}""")
+      case Failure(exception) =>
+        actorSystem.log.error("Failed to bind HTTP endpoint, terminating system", exception)
+        actorSystem.terminate()
+    }
   }
+
+  def main(args: Array[String]): Unit = {
+    startServer(helloWorldRoute)(getActorSystem, getExecutionContext)
+  }
+
+  private def getAddres: String = {
+    config.getString("app.address")
+  }
+
+  private def getPort: Int = {
+    config.getInt("app.port")
+  }
+
+  private def getExecutionContext: ExecutionContext = {
+    ExecutionContext.global
+  }
+
+  private def getActorSystem: ActorSystem[Nothing] = {
+    ActorSystem(Behaviors.empty, "csv-api")
+  }
+
+  private def helloWorldRoute: Route = {
+    path("hello-world") {
+      complete(StatusCodes.OK, "Hola mundo")
+    }
+  }
+
 }
