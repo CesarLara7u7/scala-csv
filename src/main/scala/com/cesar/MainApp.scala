@@ -9,6 +9,7 @@ import akka.http.scaladsl.server.Route
 import com.cesar.api.csv.Routes
 import com.google.inject.Guice
 import com.typesafe.config.{Config, ConfigFactory}
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}

@@ -6,7 +6,8 @@ import jakarta.inject.{Inject, Singleton}
 @Singleton
 class Routes @Inject()(csvControllerRoutes: CsvControllerRoutes) {
 
-  def allRoutes: Route =
+  def allRoutes: Route = cors() {
     concat(csvControllerRoutes.publicRoutes)
+  }
 
 }

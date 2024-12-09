@@ -5,8 +5,8 @@ ThisBuild / organization := "com.cesar"
 
 ThisBuild / scalafixScalaBinaryVersion := "2.13"
 
-val AkkaVersion = "2.9.0"
-val AkkaHttpVersion = "10.6.0"
+val AkkaVersion = "2.10.0"
+val AkkaHttpVersion = "10.7.0"
 val swaggerVersion = "2.2.18"
 val jacksonVersion = "2.17.0"
 
