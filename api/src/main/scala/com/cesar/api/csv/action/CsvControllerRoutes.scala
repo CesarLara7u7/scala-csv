@@ -1,12 +1,10 @@
-package com.cesar.api.csv
+package com.cesar.api.csv.action
 
 import akka.http.scaladsl.common.StrictForm.FileData
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import com.cesar.api.csv.action.controller.CsvController
 import jakarta.inject.{Inject, Singleton}
-
-import java.io.ByteArrayOutputStream
 
 @Singleton
 class CsvControllerRoutes @Inject()(csvController: CsvController) {
@@ -19,14 +17,11 @@ class CsvControllerRoutes @Inject()(csvController: CsvController) {
             extractRequestContext { _ =>
               formFields("csv".as[FileData]) { (fileData) =>
                 println(fileData)
-                complete(StatusCodes.OK)
+                csvController.receiveCsv(fileData)
               }
             }
           }
-        },
-        get {
-          csvController.receiveCsv
-        },
+        }
       )
     },
   )

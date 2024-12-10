@@ -1,6 +1,7 @@
 package com.cesar.api
 
-import com.cesar.api.csv.{CsvController, CsvControllerImpl, Routes}
+import com.cesar.api.csv.action.controller.{CsvController, CsvControllerImpl}
+import com.cesar.api.csv.Routes
 import com.google.inject.{AbstractModule, Singleton}
 
 class ApiModule extends  AbstractModule{

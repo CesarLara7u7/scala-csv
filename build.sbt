@@ -27,6 +27,7 @@ lazy val business = (project in file("business")).settings(
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
+    "com.github.tototoshi" %% "scala-csv" % "2.0.0"
   ) ++ swaggerDependencies,
   commonSettings
 )
@@ -49,7 +50,8 @@ val swaggerDependencies = Seq(
   "com.github.swagger-akka-http" %% "swagger-scala-module" % "2.12.0",
   "com.github.swagger-akka-http" %% "swagger-enumeratum-module" % "2.9.0",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-  "io.swagger.core.v3" % "swagger-jaxrs2-jakarta" % swaggerVersion
+  "io.swagger.core.v3" % "swagger-jaxrs2-jakarta" % swaggerVersion,
+  "net.codingwell" %% "scala-guice" % "7.0.0",
 )
 
 lazy val api = (project in file("api"))
@@ -59,7 +61,6 @@ lazy val api = (project in file("api"))
       "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
-      "net.codingwell" %% "scala-guice" % "7.0.0",
     ) ++ swaggerDependencies,
     commonSettings
   ).dependsOn(business, data)
