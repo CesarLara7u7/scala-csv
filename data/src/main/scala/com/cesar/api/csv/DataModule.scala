@@ -9,6 +9,6 @@ class DataModule extends AbstractModule{
   }
 
   def connectDatabase(): Unit = {
-    new Datab
+
   }
 }
