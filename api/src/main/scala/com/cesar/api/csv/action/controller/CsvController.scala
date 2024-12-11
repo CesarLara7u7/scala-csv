@@ -5,5 +5,9 @@ import akka.http.scaladsl.server.Route
 
 trait CsvController {
 
-  def receiveCsv(fileData: FileData):Route
+  def receiveCsv(fileData: FileData): Route
+
+  def receiveEmployees(fileData: FileData):Route
+  def receiveDepartments(fileData: FileData):Route
+  def receiveJobs(fileData: FileData):Route
 }

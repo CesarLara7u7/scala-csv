@@ -32,7 +32,7 @@ object MainApp {
   }
 
   def main(args: Array[String]): Unit = {
-    val module = Guice.createInjector(new Module)
+    val module = Guice.createInjector(new Module(getActorSystem))
     val routes = module.getInstance(classOf[Routes]).allRoutes
     startServer(routes)(getActorSystem, getExecutionContext)
   }
@@ -45,9 +45,7 @@ object MainApp {
     config.getInt("app.port")
   }
 
-  private def getExecutionContext: ExecutionContext = {
-    ExecutionContext.global
-  }
+  private def getExecutionContext: ExecutionContext = getActorSystem.executionContext
 
   private def getActorSystem: ActorSystem[Nothing] = {
     ActorSystem(Behaviors.empty, "csv-api")

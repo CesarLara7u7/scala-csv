@@ -11,8 +11,8 @@ class CsvControllerRoutes @Inject()(csvController: CsvController) {
 
   def publicRoutes: Route = concat(
     pathPrefix("csv") {
-      concat(
-        post {
+      post {
+        concat(
           pathPrefix("file") {
             extractRequestContext { _ =>
               formFields("csv".as[FileData]) { (fileData) =>
@@ -20,9 +20,26 @@ class CsvControllerRoutes @Inject()(csvController: CsvController) {
                 csvController.receiveCsv(fileData)
               }
             }
-          }
-        }
-      )
+          },
+          pathPrefix("employees") {
+            extractRequestContext { _ =>
+              formFields("csv".as[FileData]) { (fileData) =>
+                csvController.receiveEmployees(fileData)
+              }
+            }
+          },
+          pathPrefix("departments") { extractRequestContext { _ =>
+              formFields("csv".as[FileData]) { (fileData) =>
+                csvController.receiveDepartments(fileData)
+              }
+            }},
+          pathPrefix("jobs") { extractRequestContext { _ =>
+              formFields("csv".as[FileData]) { (fileData) =>
+                csvController.receiveJobs(fileData)
+              }
+            }},
+        )
+      }
     },
   )
 }
