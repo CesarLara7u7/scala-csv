@@ -1,4 +1,4 @@
-package com.cesar.api.dto
+package com.cesar.api.employee
 
 case class HiredEmployee(
                      id: Int,

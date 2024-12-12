@@ -6,10 +6,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.cesar.api.csv.Routes
+import com.cesar.api.Routes
 import com.google.inject.Guice
 import com.typesafe.config.{Config, ConfigFactory}
-import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -32,7 +31,7 @@ object MainApp {
   }
 
   def main(args: Array[String]): Unit = {
-    val module = Guice.createInjector(new Module(getActorSystem))
+    val module = Guice.createInjector(new Module(getActorSystem,config))
     val routes = module.getInstance(classOf[Routes]).allRoutes
     startServer(routes)(getActorSystem, getExecutionContext)
   }

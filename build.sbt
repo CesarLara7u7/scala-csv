@@ -12,11 +12,13 @@ val jacksonVersion = "2.17.2"
 
 Compile/mainClass := Some("com.cesar.MainApp")
 lazy val commonSettings = Seq(
-  resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+  resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
+  libraryDependencies ++= commonDependencies
 )
 
 lazy val commonDependencies = Seq(
   "com.fasterxml.uuid" % "java-uuid-generator" % "5.1.0",
+  "io.scalaland" %% "chimney" % "1.5.0"
 )
 
 
@@ -41,6 +43,9 @@ lazy val data = (project in file("data"))
     libraryDependencies ++= Seq(
       "com.typesafe.slick" %% "slick" % "3.5.0",
       "org.slf4j" % "slf4j-nop" % "2.0.13",
+      "org.liquibase" % "liquibase-core" % "4.29.0",
+      "io.github.liquibase4s" %% "liquibase4s-core" % "1.0.0",
+      "org.postgresql" % "postgresql" % "42.7.3"
     ),
     commonSettings
   )

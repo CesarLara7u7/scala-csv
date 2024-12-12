@@ -1,13 +1,13 @@
-package com.cesar.api.csv.action
+package com.cesar.api.action
 
 import akka.http.scaladsl.common.StrictForm.FileData
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.cesar.api.csv.action.controller.CsvController
+import com.cesar.api.action.controller.ApiController
 import jakarta.inject.{Inject, Singleton}
 
 @Singleton
-class CsvControllerRoutes @Inject()(csvController: CsvController) {
+class ApiRoutes @Inject()(apiController: ApiController) {
 
   def publicRoutes: Route = concat(
     pathPrefix("csv") {
@@ -17,29 +17,39 @@ class CsvControllerRoutes @Inject()(csvController: CsvController) {
             extractRequestContext { _ =>
               formFields("csv".as[FileData]) { (fileData) =>
                 println(fileData)
-                csvController.receiveCsv(fileData)
+                apiController.receiveCsv(fileData)
               }
             }
           },
           pathPrefix("employees") {
             extractRequestContext { _ =>
               formFields("csv".as[FileData]) { (fileData) =>
-                csvController.receiveEmployees(fileData)
+                apiController.receiveEmployees(fileData)
               }
             }
           },
-          pathPrefix("departments") { extractRequestContext { _ =>
+          pathPrefix("departments") {
+            extractRequestContext { _ =>
               formFields("csv".as[FileData]) { (fileData) =>
-                csvController.receiveDepartments(fileData)
+                apiController.receiveDepartments(fileData)
               }
-            }},
-          pathPrefix("jobs") { extractRequestContext { _ =>
+            }
+          },
+          pathPrefix("jobs") {
+            extractRequestContext { _ =>
               formFields("csv".as[FileData]) { (fileData) =>
-                csvController.receiveJobs(fileData)
+                apiController.receiveJobs(fileData)
               }
-            }},
+            }
+          }
         )
       }
     },
+    pathPrefix("api" / "statistics") {
+      get {
+        apiController.getStatistics
+      }
+    }
+
   )
 }

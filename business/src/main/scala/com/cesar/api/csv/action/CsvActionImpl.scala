@@ -5,7 +5,11 @@ import akka.http.scaladsl.common.StrictForm
 import akka.http.scaladsl.common.StrictForm.FileData
 import akka.stream.alpakka.csv.scaladsl._
 import akka.stream.scaladsl.{Sink, Source}
-import com.cesar.api.dto.{Department, HiredEmployee, Job}
+import com.cesar.api.department.{Department, DepartmentGateway}
+import com.cesar.api.employee.{EmployeeGateway, HiredEmployee}
+import com.cesar.api.job.{Job, JobGateway}
+import io.scalaland.chimney.dsl.TransformationOps
+import io.scalaland.chimney.syntax.TransformerOps
 import jakarta.inject.{Inject, Singleton}
 import org.slf4j.LoggerFactory
 
@@ -15,7 +19,11 @@ import scala.concurrent.duration.Duration
 import scala.util.Try
 
 @Singleton
-class CsvActionImpl @Inject()()(implicit ac: ActorSystem[Nothing]) extends CsvAction {
+class CsvActionImpl @Inject()(
+                               departmentGateway: DepartmentGateway,
+                               jobGateway: JobGateway,
+                               employeeGateway: EmployeeGateway
+                             )(implicit ac: ActorSystem[Nothing]) extends CsvAction {
   private val log = LoggerFactory.getLogger(getClass)
 
   private def fileDataIntoMap[T](fileData: FileData, clazz: Class[T]): Seq[Map[String, String]] = Await.result({
@@ -39,14 +47,17 @@ class CsvActionImpl @Inject()()(implicit ac: ActorSystem[Nothing]) extends CsvAc
         id = map("id").toInt,
         name = map("name"),
         datetime = map("datetime"),
-        departmentId = map("jobId").toIntOption.getOrElse(0),
+        departmentId = map("departmentId").toIntOption.getOrElse(0),
         jobId = map("jobId").toIntOption.getOrElse(0)
       )
     }
     val invalid = employees.filter(e => e.name.isEmpty || e.jobId == 0 || e.departmentId == 0 || e.id == 0 || e.datetime.isEmpty)
     log.info("invalid employees=> {}, {}", invalid.size, invalid)
     val valid = employees.filterNot(invalid.contains)
-    log.info("valid employees => {}", valid.size)
+    log.info("valid employees => {}", valid)
+    val database = employeeGateway.getAll
+    if(database.isEmpty) employeeGateway.saveEmployees(valid)
+    else valid.filterNot(database.contains).foreach(employeeGateway.saveOrUpdate)
   }
 
   override def receiveDepartments(fileData: StrictForm.FileData): Try[Unit] = Try {
@@ -58,7 +69,10 @@ class CsvActionImpl @Inject()()(implicit ac: ActorSystem[Nothing]) extends CsvAc
     log.info("invalid departments=> {}, {}", invalid.size, invalid)
     val valid = departments.filterNot(invalid.contains)
     log.info("valid departments => {}", valid.size)
-    valid.foreach(println)
+    val database = departmentGateway.getAll
+    log.info("WaZAA " + database.size)
+    if(database.isEmpty) departmentGateway.saveDepartments(valid)
+    else valid.filterNot(database.contains).foreach(departmentGateway.saveOrUpdate)
   }
 
   override def receiveJobs(fileData: StrictForm.FileData): Try[Unit] = Try {
@@ -68,8 +82,35 @@ class CsvActionImpl @Inject()()(implicit ac: ActorSystem[Nothing]) extends CsvAc
     log.info("invalid jobs=> {}, {}", invalid.size, invalid)
     val valid = jobs.filterNot(invalid.contains)
     log.info("valid jobs => {}", valid.size)
-    valid.foreach(println)
+    val database = jobGateway.getAll
+    if(database.isEmpty) jobGateway.saveJobs(valid)
+    else valid.filterNot(database.contains).foreach(jobGateway.saveOrUpdate)
   }
 
+
+  override def getJobs: Try[Seq[Job]] = Try {
+    jobGateway.getAll
+  }
+
+  override def getDepartments: Try[Seq[Department]] = Try {
+    departmentGateway.getAll
+  }
+
+  override def getEmployees: Try[Seq[HiredEmployee]] = Try {
+    employeeGateway.getAll
+  }
+
+  override def getStatistics: Try[Seq[Statistics]] = Try{
+    employeeGateway.getStatistics.map(_
+      .into[Statistics]
+      .withFieldComputed(_.department, _._1)
+      .withFieldComputed(_.job, _._2)
+      .withFieldComputed(_.Q1, _._3)
+      .withFieldComputed(_.Q2, _._4)
+      .withFieldComputed(_.Q3, _._5)
+      .withFieldComputed(_.Q4, _._6)
+      .transform
+    )
+  }
 
 }

@@ -1,17 +1,17 @@
 --liquibase formatted sql
 --changeset Cesar:01
-CREATE TABLE department
+CREATE TABLE if not exists department
 (
     id         integer PRIMARY KEY NOT NULL,
     department TEXT                NOT NULL
 );
-CREATE TABLE job
+CREATE TABLE if not exists  job
 (
     id  integer PRIMARY KEY NOT NULL,
     job TEXT                NOT NULL
 );
 
-CREATE TABLE hired_employees
+CREATE TABLE if not exists  hired_employees
 (
     id            integer PRIMARY KEY NOT NULL,
     name          TEXT                NOT NULL,
