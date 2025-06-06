@@ -11,3 +11,4 @@ class ApiModule extends  AbstractModule{
     bind(classOf[Routes]).in(classOf[Singleton])
   }
 }
+
